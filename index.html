@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kait Mobile Car Wash – Book Online</title>
+  <meta name="description" content="Kait Mobile Car Wash – Fast, affordable mobile car washing in Port Moresby. Book online via WhatsApp." />
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <style>
+    :root{
+      --primary:#0ea5e9;
+      --primary-700:#0284c7;
+      --bg:#f8fafc;
+      --text:#0f172a;
+      --muted:#64748b;
+      --card:#ffffff;
+      --ring:rgba(14,165,233,.35);
+      --radius:16px;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--text);background:var(--bg)}
+    a{color:var(--primary);text-decoration:none}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    .nav{position:sticky;top:0;backdrop-filter:saturate(180%) blur(10px);background:rgba(255,255,255,.85);border-bottom:1px solid #e5e7eb;z-index:50}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 24px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .brand img{width:44px;height:44px;border-radius:12px;object-fit:cover}
+    .brand-title{font-weight:800}
+    .muted{color:var(--muted)}
+    .cta{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 16px;border-radius:12px;border:1px solid #e5e7eb;background:var(--card);color:var(--text);font-weight:600;cursor:pointer;transition:.2s ease}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 8px 20px var(--ring)}
+    .btn-primary:hover{background:var(--primary-700)}
+    .hero{padding:56px 24px 28px;background:radial-gradient(80% 70% at 20% 10%,#e0f2fe 0%,transparent 60%),radial-gradient(70% 50% at 90% 0%,#dbeafe 0%,transparent 60%)}
+    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center}
+    .hero h1{font-size:clamp(28px,5vw,44px);line-height:1.05;margin:0 0 12px}
+    .hero p{margin:0 0 14px;color:var(--muted);font-size:clamp(14px,2.5vw,18px)}
+    .card{background:var(--card);border:1px solid #e5e7eb;border-radius:var(--radius);padding:18px;box-shadow:0 1px 0 #e5e7eb}
+    .shadow-xl{box-shadow:0 20px 80px rgba(2,132,199,.15)}
+    .section{padding:32px 24px}
+    .grid{display:grid;gap:18px}
+    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .price{font-size:28px;font-weight:800}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #e5e7eb;background:#fff;outline:none}
+    input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--ring)}
+    label{font-weight:600;font-size:14px}
+    #map{width:100%;height:360px;border-radius:16px;border:1px solid #e5e7eb}
+    @media (max-width:900px){.hero-grid{grid-template-columns:1fr}}
+    @media (max-width:760px){.grid-3{grid-template-columns:1fr} .row{grid-template-columns:1fr}}
+    .footer{padding:28px 24px;border-top:1px solid #e5e7eb;color:var(--muted);text-align:center}
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <div class="nav-inner container">
+      <div class="brand">
+        <img src="assets/logo.jpg" alt="Kait Mobile Car Wash logo" />
+        <div>
+          <div class="brand-title">Kait Mobile Car Wash</div>
+          <small class="muted">Port Moresby • We come to you</small>
+        </div>
+      </div>
+      <div class="cta">
+        <a class="btn" href="tel:+67581803161">Call: +675 8180 3161</a>
+        <a class="btn btn-primary" id="waTop" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <h1>Shiny car, zero hassle 🚗✨</h1>
+        <p>Book Kait Mobile Car Wash in minutes. We come to your location anywhere in Port Moresby.</p>
+        <div class="cta" style="margin-top:12px">
+          <a class="btn btn-primary" href="#book">Book a Wash</a>
+          <a class="btn" href="#services">View Prices</a>
+        </div>
+        <div class="muted" style="margin-top:10px">Open 7 days • 8:00–18:00 PGT</div>
+      </div>
+      <div class="card shadow-xl">
+        <img src="assets/logo.jpg" alt="Kait logo large" style="width:100%;border-radius:12px;object-fit:cover;max-height:260px" />
+        <div class="muted" style="margin-top:8px">Replace with a high-res logo/photo any time.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services" class="section">
+    <div class="container">
+      <h2 style="margin:0 0 12px">Services & Prices</h2>
+      <p class="muted" style="margin:0 0 12px">Transparent pricing. Supplies included. Larger vehicles may incur a small surcharge.</p>
+      <div class="grid grid-3">
+        <div class="card"><h3>Basic Wash</h3><div class="price">K50</div><p class="muted">Exterior rinse, foam wash, wheels, quick dry.</p></div>
+        <div class="card"><h3>Secondary Wash</h3><div class="price">K100</div><p class="muted">Basic Wash + interior vacuum + windows inside/out.</p></div>
+        <div class="card"><h3>Full Detailing</h3><div class="price">K420</div><p class="muted">Deep clean: exterior, interior, wax, trim, tyres.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="book" class="section">
+    <div class="container">
+      <div class="card shadow-xl">
+        <h2 style="margin:0 0 10px">Book a Mobile Wash</h2>
+        <p class="muted" style="margin:0 0 18px">Fill this form and we’ll confirm on WhatsApp. You can also call <a href="tel:+67581803161">+675 8180 3161</a>.</p>
+        <form id="bookingForm" autocomplete="on">
+          <div class="row">
+            <div><label for="name">Full Name</label><input id="name" name="name" required placeholder="Your name" /></div>
+            <div><label for="phone">Phone (WhatsApp)</label><input id="phone" name="phone" required placeholder="7xxxxxxx" /></div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <div><label for="service">Service</label>
+              <select id="service" name="service" required>
+                <option value="Basic Wash (K50)">Basic Wash (K50)</option>
+                <option value="Secondary Wash (K100)">Secondary Wash (K100)</option>
+                <option value="Full Detailing (K420)">Full Detailing (K420)</option>
+              </select>
+            </div>
+            <div><label for="date">Preferred Date</label><input id="date" name="date" type="date" required /></div>
+          </div>
+          <div class="row" style="margin-top:12px">
+            <div><label for="time">Preferred Time</label><input id="time" name="time" type="time" required /></div>
+            <div><label for="suburb">Location (Suburb)</label><input id="suburb" name="suburb" placeholder="e.g., Waigani, Gordons, Hohola" /></div>
+          </div>
+          <div style="margin-top:12px">
+            <label for="notes">Notes (vehicle model, special requests)</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="e.g., Toyota Hilux, pet hair, child seats…"></textarea>
+          </div>
+          <div style="margin-top:16px">
+            <label style="display:block;margin-bottom:8px">Drop your pin (Port Moresby)</label>
+            <div id="map"></div>
+            <small class="muted">Tip: Zoom and tap/click on the map to place the pin at your exact location.</small>
+            <input type="hidden" id="lat" name="lat" />
+            <input type="hidden" id="lng" name="lng" />
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px">
+            <button class="btn btn-primary" type="submit">Send via WhatsApp</button>
+            <a class="btn" href="mailto:kaitcarwash@example.com?subject=Booking%20Request" title="Email fallback">Email instead</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="card">
+        <h2 style="margin:0 0 8px">Chat with us on WhatsApp</h2>
+        <p class="muted" style="margin:0 0 12px">Fastest response. Tap below to start a chat and we’ll confirm your booking.</p>
+        <a class="btn btn-primary" id="waBottom" target="_blank" rel="noopener">Open WhatsApp Chat</a>
+        <p class="muted" style="margin-top:10px">WhatsApp: <strong>+675 8180 3161</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">© <span id="year"></span> Kait Mobile Car Wash • Port Moresby, PNG</footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    const WA_NUMBER = '67581803161';
+    const BUSINESS_NAME = 'Kait Mobile Car Wash';
+
+    const today = new Date();
+    const dateEl = document.getElementById('date');
+    dateEl.min = today.toISOString().split('T')[0];
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    function buildWAUrl(msg){
+      const base = `https://wa.me/${WA_NUMBER}`;
+      const text = encodeURIComponent(msg);
+      return `${base}?text=${text}`;
+    }
+
+    const intro = `Hi ${BUSINESS_NAME}! I'd like to book a car wash.`;
+    document.getElementById('waTop').href = buildWAUrl(intro);
+    document.getElementById('waBottom').href = buildWAUrl(intro);
+
+    // Leaflet Map - Port Moresby
+    const map = L.map('map').setView([-9.4438, 147.1803], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = null;
+    function setPin(lat, lng){
+      if(marker){ marker.setLatLng([lat,lng]); }
+      else { marker = L.marker([lat,lng]).addTo(map); }
+      document.getElementById('lat').value = lat.toFixed(6);
+      document.getElementById('lng').value = lng.toFixed(6);
+    }
+
+    map.on('click', (e) => {
+      const { lat, lng } = e.latlng;
+      setPin(lat, lng);
+    });
+
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition((pos)=>{
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        map.setView([lat,lng], 14);
+        setPin(lat, lng);
+      },()=>{}, { enableHighAccuracy:true, timeout:5000 });
+    }
+
+    document.getElementById('bookingForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      const form = new FormData(e.target);
+      const data = Object.fromEntries(form.entries());
+      const lines = [
+        `Booking Request – ${BUSINESS_NAME}`,
+        `Name: ${data.name}`,
+        `Phone: ${data.phone}`,
+        `Service: ${data.service}`,
+        `Date: ${data.date}`,
+        `Time: ${data.time}`,
+        data.suburb ? `Suburb: ${data.suburb}` : null,
+        (data.lat && data.lng) ? `Pin: ${data.lat}, ${data.lng}` : 'Pin: (not set)',
+        data.notes ? `Notes: ${data.notes}` : null,
+        '',
+        'Please confirm availability. Thank you!'
+      ].filter(Boolean);
+      const url = buildWAUrl(lines.join('\n'));
+      window.open(url, '_blank');
+    });
+  </script>
+</body>
+</html>
